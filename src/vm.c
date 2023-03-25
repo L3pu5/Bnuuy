@@ -33,6 +33,24 @@ Value pop(){
     return *vm.stackTop;
 }
 
+//We want to peek INTO the stack.
+static Value peek(int depth){
+    //Grab the pointer stackTop, and grab the position BEHIND it by depth
+    return vm.stackTop[-1-depth];
+}
+
+static void runTimeError( const char* format, ...){
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fputs("\n", stderr);
+
+    //Set the IP to the start of the code block to stop code from executing.
+    size_t instruction = vm.ip - vm.chunk->code -1;
+    
+}
+
 //This is the program.
 // The virtual machine reads bytes from the chunk and
 // 'dispatches' or 'decodes' them to the C implementation of the code.
@@ -41,11 +59,12 @@ static InterpretResult run(){
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 //Use a macro to define tedious repeatable chunks of code in C
+// We must unwrap, then rewrap the value
 #define BINARY_OP(op) \
-    do {\
-        Value b = pop();\
-        Value a = pop();\
-        push(a op b);\
+        do {\
+        double b = AS_NUMBER(pop());\
+        double a = AS_NUMBER(pop());\
+        push(NUMBER_VAL((a op b)));\
     } while (false)\
 
 //Definition for local scope to advance instruction pointer.
@@ -75,7 +94,14 @@ static InterpretResult run(){
 
             //Unary operation, negate a variable on the stack
             case OP_NEGATE: {
-                push(-pop());
+                //We have to check that the next number is a type that can be negated in terms of primitive.
+                if(!IS_NUMBER(peek(0))){
+                    //Print an eror message and return runtimeerrorcode.
+                    runtimeError("Operand must be a number for operation negate");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                // We must unwrap and then re-wrap the value
+                push(NUMBER_VAL(-AS_NUMBER(pop())));
                 break;
             }
             // Update line bytecode

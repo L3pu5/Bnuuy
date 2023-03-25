@@ -3,6 +3,7 @@
 
 #include "bnuuy_common.h"
 #include "compiler.h"
+#include "Bnuuy_value.h"
 #include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
@@ -186,7 +187,7 @@ static void grouping() {
 //Number expression
 static void number() {
     double value = strtod(parser.previous.start, NULL);
-    emitConstant(value);
+    emitConstant(NUMBER_VAL(value));
 }
 
 
