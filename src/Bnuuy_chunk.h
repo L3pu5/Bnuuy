@@ -6,8 +6,17 @@
 
 //OPCODES with parameters can inject data into the stream immediately after the opcode
 typedef enum {
+    //Arithmetic
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_DIVIDE,
+    OP_MULTIPLY,
+    OP_NEGATE,
+    //Line feed
     OP_UPDATE_LINE,
+    //Variables
     OP_CONSTANT,
+    //AUX
     OP_RETURN,
 } OpCode;
 

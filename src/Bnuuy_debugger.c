@@ -23,7 +23,7 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset){
     uint8_t constant = chunk->code[offset + 1];
     printf("%-16s %4d '", name, constant);
     printValue(chunk->constants.values[constant]);
-    printf("\n");
+    printf("'\n");
     return offset + 2;
 }
 
@@ -32,7 +32,7 @@ static int updateLineInstruction(const char* name, Chunk* chunk, int offset ){
     //Grab the next byte of code which is the line number.
     uint8_t line = chunk->code[offset + 1];
     chunk->line = line;
-    printf("%-16s %4d '", name, line);
+    printf("%-16s %4d ", name, line);
     printf("%u", line);
     printf("\n");
     return offset + 2;
@@ -43,6 +43,16 @@ int disassembleInstruction(Chunk* chunk, int offset){
     printf("%03u ", chunk->line);
     uint8_t instruction = chunk->code[offset];
     switch(instruction){
+        case OP_ADD:
+            return simpleInstruction("OP_ADD", offset);
+        case OP_SUBTRACT:
+            return simpleInstruction("OP_SUBTRACT", offset);
+        case OP_MULTIPLY:
+            return simpleInstruction("OP_MULTIPLY", offset);
+        case OP_DIVIDE:
+            return simpleInstruction("OP_DIVIDE", offset);
+        case OP_NEGATE:
+            return simpleInstruction("OP_NEGATE", offset);
         case OP_UPDATE_LINE:
             return updateLineInstruction("OP_UPDATE_LINE", chunk, offset);
         case OP_CONSTANT:
